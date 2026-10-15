@@ -1,8 +1,0 @@
-$ dotnet run --urls http://0.0.0.0:5080   (executado dentro do container mcr.microsoft.com/dotnet/sdk:10.0)
-      Now listening on: http://0.0.0.0:5080
-      Application started. Press Ctrl+C to shut down.
-
-$ curl http://localhost:5080/
-{"application":"DevOps Web API","version":"local","environment":"development"}
-$ curl http://localhost:5080/health
-{"status":"healthy","version":"local","environment":"development","timestamp":"2026-10-15T11:24:33.5216285Z"}
