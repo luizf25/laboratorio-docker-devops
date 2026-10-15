@@ -17,11 +17,13 @@ app.MapGet("/", () => new
     environment
 });
 
-app.MapGet("/health", () =>
-    Results.StatusCode(
-        StatusCodes.Status500InternalServerError
-    )
-);
+app.MapGet("/health", () => new
+{
+    status = "healthy",
+    version,
+    environment,
+    timestamp = DateTime.UtcNow
+});
 
 app.MapGet("/version", () => new
 {
