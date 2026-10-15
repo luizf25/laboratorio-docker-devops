@@ -1,0 +1,15 @@
+### Health check de staging PASSOU -> promover 1.1.0 para PRODUCTION
+$ docker rm -f devops-api-prod
+devops-api-prod
+$ docker run -d --name devops-api-prod -p 8082:8080 -e APP_ENVIRONMENT=production -e APP_VERSION=1.1.0 devops-webapi:1.1.0
+79d24a9badfe2a491ab1f906a11b1120787df35a08d8665d35a5a20415f049ff
+$ docker ps
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+79d24a9badfe   devops-webapi:1.1.0   "dotnet DevOpsWebApi…"   5 seconds ago    Up 4 seconds    0.0.0.0:8082->8080/tcp, [::]:8082->8080/tcp   devops-api-prod
+8e9601e593a0   devops-webapi:1.1.0   "dotnet DevOpsWebApi…"   10 seconds ago   Up 10 seconds   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp   devops-api-staging
+$ curl.exe -f http://localhost:8082/health
+{"status":"healthy","version":"1.1.0","environment":"production","timestamp":"2026-10-15T11:27:50.6052795Z"}
+[HTTP 200]
+$ curl.exe -f http://localhost:8082/version
+{"version":"1.1.0","environment":"production","message":"Nova funcionalidade da versão 1.1"}
+[HTTP 200]

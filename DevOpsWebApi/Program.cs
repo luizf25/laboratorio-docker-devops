@@ -25,5 +25,11 @@ app.MapGet("/health", () => new
     timestamp = DateTime.UtcNow
 });
 
+app.MapGet("/version", () => new
+{
+    version,
+    environment,
+    message = "Nova funcionalidade da versão 1.1"
+});
 
 app.Run();
