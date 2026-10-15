@@ -1,0 +1,6 @@
+### Mesmo healthcheck do compose aplicado à imagem 1.2.0 (falha proposital)
+$ docker ps --filter name=hc-test-120
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS                      PORTS      NAMES
+af79fbb7f9af   devops-webapi:1.2.0   "dotnet DevOpsWebApi…"   16 seconds ago   Up 15 seconds (unhealthy)   8080/tcp   hc-test-120
+$ docker inspect --format "{{.State.Health.Status}}" hc-test-120
+unhealthy

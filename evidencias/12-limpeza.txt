@@ -1,0 +1,18 @@
+$ docker compose down
+ Container devops-api-prod Stopping 
+ Container devops-api-staging Stopping 
+ Container devops-api-prod Stopped 
+ Container devops-api-prod Removing 
+ Container devops-api-prod Removed 
+ Container devops-api-staging Stopped 
+ Container devops-api-staging Removing 
+ Container devops-api-staging Removed 
+ Network devopswebapi_default Removing 
+ Network devopswebapi_default Removed 
+$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+$ docker images devops-webapi
+IMAGE                 ID             DISK USAGE   CONTENT SIZE   EXTRA
+devops-webapi:1.0.0   6bfa921023fb        341MB         96.3MB        
+devops-webapi:1.1.0   ca9a8fe88b2f        341MB         96.3MB        
+devops-webapi:1.2.0   4d280dff7cd4        341MB         96.3MB        

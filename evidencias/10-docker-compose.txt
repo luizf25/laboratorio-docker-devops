@@ -1,0 +1,117 @@
+$ docker rm -f devops-api-staging devops-api-prod
+devops-api-staging
+devops-api-prod
+$ docker compose up -d
+ Network devopswebapi_default Creating 
+ Network devopswebapi_default Creating 
+ Network devopswebapi_default Created 
+ Network devopswebapi_default Created 
+ Container devops-api-staging Creating 
+ Container devops-api-prod Creating 
+ Container devops-api-prod Created 
+ Container devops-api-staging Created 
+ Container devops-api-prod Starting 
+ Container devops-api-staging Starting 
+ Container devops-api-prod Started 
+ Container devops-api-staging Started 
+$ docker compose ps
+NAME                 IMAGE                 COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+devops-api-prod      devops-webapi:1.1.0   "dotnet DevOpsWebApi…"   production   21 seconds ago   Up 20 seconds (healthy)   0.0.0.0:8082->8080/tcp, [::]:8082->8080/tcp
+devops-api-staging   devops-webapi:1.1.0   "dotnet DevOpsWebApi…"   staging      21 seconds ago   Up 20 seconds (healthy)   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp
+$ curl.exe -f http://localhost:8081/health
+{"status":"healthy","version":"1.1.0","environment":"staging","timestamp":"2026-10-15T11:29:17.3707249Z"}
+[HTTP 200]
+$ curl.exe -f http://localhost:8082/health
+{"status":"healthy","version":"1.1.0","environment":"production","timestamp":"2026-10-15T11:29:17.4045733Z"}
+[HTTP 200]
+$ docker inspect --format "{{.Name}} -> {{.State.Health.Status}}" devops-api-staging devops-api-prod
+/devops-api-staging -> healthy
+/devops-api-prod -> healthy
+$ docker compose logs
+devops-api-staging  | warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+devops-api-staging  |       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://+:8080'.
+devops-api-staging  | info: Microsoft.Hosting.Lifetime[14]
+devops-api-staging  |       Now listening on: http://[::]:8080
+devops-api-staging  | info: Microsoft.Hosting.Lifetime[0]
+devops-api-staging  |       Application started. Press Ctrl+C to shut down.
+devops-api-staging  | info: Microsoft.Hosting.Lifetime[0]
+devops-api-staging  |       Hosting environment: Production
+devops-api-staging  | info: Microsoft.Hosting.Lifetime[0]
+devops-api-staging  |       Content root path: /app
+devops-api-prod     | warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+devops-api-prod     |       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://+:8080'.
+devops-api-prod     | info: Microsoft.Hosting.Lifetime[14]
+devops-api-prod     |       Now listening on: http://[::]:8080
+devops-api-prod     | info: Microsoft.Hosting.Lifetime[0]
+devops-api-prod     |       Application started. Press Ctrl+C to shut down.
+devops-api-prod     | info: Microsoft.Hosting.Lifetime[0]
+devops-api-prod     |       Hosting environment: Production
+devops-api-prod     | info: Microsoft.Hosting.Lifetime[0]
+devops-api-prod     |       Content root path: /app
+$ docker compose config
+name: devopswebapi
+services:
+  production:
+    container_name: devops-api-prod
+    environment:
+      APP_ENVIRONMENT: production
+      APP_VERSION: 1.1.0
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf "GET /health HTTP/1.1\r\nHost:
+          localhost\r\nConnection: close\r\n\r\n" >&3 && head -n 1 <&3 | grep -q "
+          200 "'
+      timeout: 5s
+      interval: 10s
+      retries: 3
+      start_period: 5s
+    image: devops-webapi:1.1.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8082"
+        protocol: tcp
+  staging:
+    container_name: devops-api-staging
+    environment:
+      APP_ENVIRONMENT: staging
+      APP_VERSION: 1.1.0
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf "GET /health HTTP/1.1\r\nHost:
+          localhost\r\nConnection: close\r\n\r\n" >&3 && head -n 1 <&3 | grep -q "
+          200 "'
+      timeout: 5s
+      interval: 10s
+      retries: 3
+      start_period: 5s
+    image: devops-webapi:1.1.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8081"
+        protocol: tcp
+networks:
+  default:
+    name: devopswebapi_default
+x-healthcheck:
+  interval: 10s
+  retries: 3
+  start_period: 5s
+  test:
+    - CMD
+    - bash
+    - -c
+    - 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf "GET /health HTTP/1.1\r\nHost: localhost\r\nConnection:
+      close\r\n\r\n" >&3 && head -n 1 <&3 | grep -q " 200 "'
+  timeout: 5s
